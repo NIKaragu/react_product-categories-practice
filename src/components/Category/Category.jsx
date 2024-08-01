@@ -1,6 +1,11 @@
-export const Category = ({ category }) => {
+export const Category = ({ category, buttonIsActive, setButtonIsActive }) => {
   return (
-    <a data-cy="Category" className="button mr-2 my-1 is-info" href="#/">
+    <a
+      data-cy="Category"
+      className="button mr-2 my-1 is-info"
+      href="#/"
+      onClick={() => {}}
+    >
       {category.title}
     </a>
   );

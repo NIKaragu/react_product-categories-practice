@@ -9,13 +9,6 @@ import usersFromServer from './api/users';
 import categoriesFromServer from './api/categories';
 import productsFromServer from './api/products';
 
-// const products = productsFromServer.map((product) => {
-//   const category = null; // find by product.categoryId
-//   const user = null; // find by category.ownerId
-
-//   return null;
-// });
-
 export const products = productsFromServer.map(product => {
   const category = categoriesFromServer.find(
     category_ => category_.id === product.categoryId,
@@ -65,21 +58,40 @@ function filterProductsByUser(products_, userNameQuery) {
   const visibleProductsDataByUser = [...products_];
 
   if (userNameQuery === 'All') {
-    return [...products_];
+    return visibleProductsDataByUser;
   }
 
   return visibleProductsDataByUser.filter(
     userProducts => userProducts.ownerName === userNameQuery,
   );
 }
-// console.log(products);
+
+// function filterProductsByCategory(products_, categoryQuery) {
+//   let visibleProducts = [...products_];
+
+//   if (categoryQuery.includes('All')) {
+//     return visibleProducts;
+//   }
+
+//   visibleProducts = visibleProducts.filter(product =>
+//     categoryQuery.includes(product.categoryTitle),
+//   );
+
+//   return visibleProducts;
+// }
 
 export const App = () => {
   const [currentQueryByUserName, setCurrentQueryByUserName] = useState('All');
-  const visibleProducts = filterProductsByUser(
+  const visibleProductsByUserName = filterProductsByUser(
     products,
     currentQueryByUserName,
   );
+  // const selectedCategories = [];
+  const [categoryButtonIsActive, setCategoryButtonIsActive] = useState(false);
+  // const visibleProductsByCategory = filterProductsByCategory(
+  //   visibleProductsByUserName,
+  //   selectedCategories,
+  // );
 
   return (
     <div className="section">
@@ -147,7 +159,12 @@ export const App = () => {
               </a>
 
               {categoriesFromServer.map(category => (
-                <Category category={category} key={category.title} />
+                <Category
+                  category={category}
+                  buttonIsActive={categoryButtonIsActive}
+                  setButtonIsActive={setCategoryButtonIsActive}
+                  key={category.title}
+                />
               ))}
             </div>
 
@@ -164,11 +181,13 @@ export const App = () => {
         </div>
 
         <div className="box table-container">
-          <p data-cy="NoMatchingMessage">
-            No products matching selected criteria
-          </p>
-
-          <Table products={visibleProducts} />
+          {visibleProductsByUserName.length === 0 ? (
+            <p data-cy="NoMatchingMessage">
+              No products matching selected criteria
+            </p>
+          ) : (
+            <Table products={visibleProductsByUserName} />
+          )}
         </div>
       </div>
     </div>
