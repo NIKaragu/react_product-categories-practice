@@ -91,6 +91,12 @@ export const App = () => {
     visibleProductsByUserName,
     selectedCategories,
   );
+  const [searchQuery, setSearchQuery] = useState('');
+  const resetFilters = () => {
+    if (selectedCategories.length !== 0) {
+      setSelectedCategories([]);
+    }
+  };
   // console.log(selectedCategories.length === 0)
 
   return (
@@ -131,7 +137,10 @@ export const App = () => {
                   type="text"
                   className="input"
                   placeholder="Search"
-                  value="qwe"
+                  value={searchQuery}
+                  onChange={event => {
+                    setSearchQuery(event.target.value);
+                  }}
                 />
 
                 <span className="icon is-left">
@@ -156,11 +165,7 @@ export const App = () => {
                 className={classNames('button is-success mr-6', {
                   'is-outlined': selectedCategories.length !== 0,
                 })}
-                onClick={() => {
-                  if (selectedCategories.length !== 0) {
-                    setSelectedCategories([]);
-                  }
-                }}
+                onClick={resetFilters}
               >
                 All
               </a>
@@ -180,6 +185,7 @@ export const App = () => {
                 data-cy="ResetAllButton"
                 href="#/"
                 className="button is-link is-outlined is-fullwidth"
+                onClick={resetFilters}
               >
                 Reset all filters
               </a>

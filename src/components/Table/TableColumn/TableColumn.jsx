@@ -1,3 +1,5 @@
+import classNames from 'classnames';
+
 /* eslint-disable jsx-a11y/accessible-emoji */
 export const TableColumn = ({ product }) => {
   return (
@@ -11,7 +13,13 @@ export const TableColumn = ({ product }) => {
         {product.categoryIcon} - {product.categoryTitle}
       </td>
 
-      <td data-cy="ProductUser" className="has-text-link">
+      <td
+        data-cy="ProductUser"
+        className={classNames({
+          'has-text-link': product.ownerSex === 'm',
+          'has-text-danger': product.ownerSex === 'f',
+        })}
+      >
         {product.ownerName}
       </td>
     </tr>
