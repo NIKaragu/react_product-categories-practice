@@ -1,8 +1,8 @@
 /* eslint-disable jsx-a11y/accessible-emoji */
-import React from 'react';
+import React, { useState } from 'react';
+import classNames from 'classnames';
 import './App.scss';
 import { Table } from './components/Table/Table';
-
 import { User } from './components/User/User';
 import { Category } from './components/Category/Category';
 import usersFromServer from './api/users';
@@ -61,85 +61,116 @@ const userProductData = usersFromServer.map(user => {
   };
 });
 
+function filterProductsByUser(products_, userNameQuery) {
+  const visibleProductsDataByUser = [...products_];
+
+  if (userNameQuery === 'All') {
+    return [...products_];
+  }
+
+  return visibleProductsDataByUser.filter(
+    userProducts => userProducts.ownerName === userNameQuery,
+  );
+}
 // console.log(products);
 
-export const App = () => (
-  <div className="section">
-    <div className="container">
-      <h1 className="title">Product Categories</h1>
+export const App = () => {
+  const [currentQueryByUserName, setCurrentQueryByUserName] = useState('All');
+  const visibleProducts = filterProductsByUser(
+    products,
+    currentQueryByUserName,
+  );
 
-      <div className="block">
-        <nav className="panel">
-          <p className="panel-heading">Filters</p>
+  return (
+    <div className="section">
+      <div className="container">
+        <h1 className="title">Product Categories</h1>
 
-          <p className="panel-tabs has-text-weight-bold">
-            <a data-cy="FilterAllUsers" href="#/">
-              All
-            </a>
+        <div className="block">
+          <nav className="panel">
+            <p className="panel-heading">Filters</p>
 
-            {userProductData.map(user => (
-              <User user={user} key={user.userId} />
-            ))}
+            <p className="panel-tabs has-text-weight-bold">
+              <a
+                data-cy="FilterAllUsers"
+                href="#/"
+                className={classNames({
+                  'is-active': currentQueryByUserName === 'All',
+                })}
+                onClick={() => setCurrentQueryByUserName('All')}
+              >
+                All
+              </a>
+
+              {userProductData.map(user => (
+                <User
+                  user={user}
+                  setUserQuery={setCurrentQueryByUserName}
+                  currentQuery={currentQueryByUserName}
+                  key={user.userName}
+                />
+              ))}
+            </p>
+
+            <div className="panel-block">
+              <p className="control has-icons-left has-icons-right">
+                <input
+                  data-cy="SearchField"
+                  type="text"
+                  className="input"
+                  placeholder="Search"
+                  value="qwe"
+                />
+
+                <span className="icon is-left">
+                  <i className="fas fa-search" aria-hidden="true" />
+                </span>
+
+                <span className="icon is-right">
+                  {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
+                  <button
+                    data-cy="ClearButton"
+                    type="button"
+                    className="delete"
+                  />
+                </span>
+              </p>
+            </div>
+
+            <div className="panel-block is-flex-wrap-wrap">
+              <a
+                href="#/"
+                data-cy="AllCategories"
+                className="button is-success mr-6 is-outlined"
+              >
+                All
+              </a>
+
+              {categoriesFromServer.map(category => (
+                <Category category={category} key={category.title} />
+              ))}
+            </div>
+
+            <div className="panel-block">
+              <a
+                data-cy="ResetAllButton"
+                href="#/"
+                className="button is-link is-outlined is-fullwidth"
+              >
+                Reset all filters
+              </a>
+            </div>
+          </nav>
+        </div>
+
+        <div className="box table-container">
+          <p data-cy="NoMatchingMessage">
+            No products matching selected criteria
           </p>
 
-          <div className="panel-block">
-            <p className="control has-icons-left has-icons-right">
-              <input
-                data-cy="SearchField"
-                type="text"
-                className="input"
-                placeholder="Search"
-                value="qwe"
-              />
-
-              <span className="icon is-left">
-                <i className="fas fa-search" aria-hidden="true" />
-              </span>
-
-              <span className="icon is-right">
-                {/* eslint-disable-next-line jsx-a11y/control-has-associated-label */}
-                <button
-                  data-cy="ClearButton"
-                  type="button"
-                  className="delete"
-                />
-              </span>
-            </p>
-          </div>
-
-          <div className="panel-block is-flex-wrap-wrap">
-            <a
-              href="#/"
-              data-cy="AllCategories"
-              className="button is-success mr-6 is-outlined"
-            >
-              All
-            </a>
-
-            {categoriesFromServer.map(category => (
-              <Category category={category} key={category.title} />
-            ))}
-          </div>
-
-          <div className="panel-block">
-            <a
-              data-cy="ResetAllButton"
-              href="#/"
-              className="button is-link is-outlined is-fullwidth"
-            >
-              Reset all filters
-            </a>
-          </div>
-        </nav>
-      </div>
-
-      <div className="box table-container">
-        <p data-cy="NoMatchingMessage">
-          No products matching selected criteria
-        </p>
-
-        <Table products={products} />
+          <Table products={visibleProducts} />
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
