@@ -71,14 +71,14 @@ function filterProductsByCategory(products_, categoryQuery, query) {
 
   if (categoryQuery.length === 0) {
     return visibleProducts.filter(product =>
-      product.productName.toLowerCase().includes(query.toLowerCase()),
+      product.productName.toLowerCase().includes(query.toLowerCase().trim()),
     );
   }
 
   visibleProducts = visibleProducts.filter(
     product =>
       categoryQuery.includes(product.categoryTitle) &&
-      product.productName.toLowerCase().includes(query.toLowerCase()),
+      product.productName.toLowerCase().includes(query.toLowerCase().trim()),
   );
 
   return visibleProducts;
