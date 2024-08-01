@@ -66,15 +66,19 @@ function filterProductsByUser(products_, userNameQuery) {
   );
 }
 
-function filterProductsByCategory(products_, categoryQuery) {
+function filterProductsByCategory(products_, categoryQuery, query) {
   let visibleProducts = [...products_];
 
   if (categoryQuery.length === 0) {
-    return visibleProducts;
+    return visibleProducts.filter(product =>
+      product.productName.toLowerCase().includes(query.toLowerCase()),
+    );
   }
 
-  visibleProducts = visibleProducts.filter(product =>
-    categoryQuery.includes(product.categoryTitle),
+  visibleProducts = visibleProducts.filter(
+    product =>
+      categoryQuery.includes(product.categoryTitle) &&
+      product.productName.toLowerCase().includes(query.toLowerCase()),
   );
 
   return visibleProducts;
@@ -82,6 +86,7 @@ function filterProductsByCategory(products_, categoryQuery) {
 
 export const App = () => {
   const [currentQueryByUserName, setCurrentQueryByUserName] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
   const visibleProductsByUserName = filterProductsByUser(
     products,
     currentQueryByUserName,
@@ -90,8 +95,8 @@ export const App = () => {
   const visibleProductsByCategory = filterProductsByCategory(
     visibleProductsByUserName,
     selectedCategories,
+    searchQuery,
   );
-  const [searchQuery, setSearchQuery] = useState('');
   const resetFilters = () => {
     if (selectedCategories.length !== 0) {
       setSelectedCategories([]);
