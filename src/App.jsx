@@ -3,9 +3,11 @@ import React from 'react';
 import './App.scss';
 import { Table } from './components/Table/Table';
 
-// import usersFromServer from './api/users';
-// import categoriesFromServer from './api/categories';
-// import productsFromServer from './api/products';
+import { User } from './components/User/User';
+import { Category } from './components/Category/Category';
+import usersFromServer from './api/users';
+import categoriesFromServer from './api/categories';
+import productsFromServer from './api/products';
 
 // const products = productsFromServer.map((product) => {
 //   const category = null; // find by product.categoryId
@@ -13,6 +15,53 @@ import { Table } from './components/Table/Table';
 
 //   return null;
 // });
+
+export const products = productsFromServer.map(product => {
+  const category = categoriesFromServer.find(
+    category_ => category_.id === product.categoryId,
+  );
+
+  const user = usersFromServer.find(user_ => user_.id === category.ownerId);
+
+  return {
+    productId: product.id,
+    productName: product.name,
+    categoryId: category.id,
+    categoryTitle: category.title,
+    categoryIcon: category.icon,
+    ownerId: user.id,
+    ownerName: user.name,
+    ownerSex: user.sex,
+  };
+});
+
+const userProductData = usersFromServer.map(user => {
+  const userCategories = categoriesFromServer.filter(
+    category => category.ownerId === user.id,
+  );
+
+  const userProducts = productsFromServer.filter(product =>
+    userCategories.some(category => category.id === product.categoryId),
+  );
+
+  return {
+    userId: user.id,
+    userName: user.name,
+    userSex: user.sex,
+    categories: userCategories.map(category => ({
+      categoryId: category.id,
+      categoryTitle: category.title,
+      categoryIcon: category.icon,
+    })),
+    products: userProducts.map(product => ({
+      productId: product.id,
+      productName: product.name,
+      categoryId: product.categoryId,
+    })),
+  };
+});
+
+// console.log(products);
 
 export const App = () => (
   <div className="section">
@@ -28,17 +77,9 @@ export const App = () => (
               All
             </a>
 
-            <a data-cy="FilterUser" href="#/">
-              User 1
-            </a>
-
-            <a data-cy="FilterUser" href="#/" className="is-active">
-              User 2
-            </a>
-
-            <a data-cy="FilterUser" href="#/">
-              User 3
-            </a>
+            {userProductData.map(user => (
+              <User user={user} key={user.userId} />
+            ))}
           </p>
 
           <div className="panel-block">
@@ -75,28 +116,9 @@ export const App = () => (
               All
             </a>
 
-            <a
-              data-cy="Category"
-              className="button mr-2 my-1 is-info"
-              href="#/"
-            >
-              Category 1
-            </a>
-
-            <a data-cy="Category" className="button mr-2 my-1" href="#/">
-              Category 2
-            </a>
-
-            <a
-              data-cy="Category"
-              className="button mr-2 my-1 is-info"
-              href="#/"
-            >
-              Category 3
-            </a>
-            <a data-cy="Category" className="button mr-2 my-1" href="#/">
-              Category 4
-            </a>
+            {categoriesFromServer.map(category => (
+              <Category category={category} key={category.title} />
+            ))}
           </div>
 
           <div className="panel-block">
@@ -116,7 +138,7 @@ export const App = () => (
           No products matching selected criteria
         </p>
 
-        <Table />
+        <Table products={products} />
       </div>
     </div>
   </div>

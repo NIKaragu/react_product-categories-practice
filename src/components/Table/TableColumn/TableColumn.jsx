@@ -1,16 +1,18 @@
 /* eslint-disable jsx-a11y/accessible-emoji */
-export const TableColumn = () => {
+export const TableColumn = ({ product }) => {
   return (
     <tr data-cy="Product">
       <td className="has-text-weight-bold" data-cy="ProductId">
-        1
+        {product.productId}
       </td>
 
-      <td data-cy="ProductName">Milk</td>
-      <td data-cy="ProductCategory">🍺 - Drinks</td>
+      <td data-cy="ProductName">{product.productName}</td>
+      <td data-cy="ProductCategory">
+        {product.categoryIcon} - {product.categoryTitle}
+      </td>
 
       <td data-cy="ProductUser" className="has-text-link">
-        Max
+        {product.ownerName}
       </td>
     </tr>
   );
