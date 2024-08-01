@@ -66,19 +66,19 @@ function filterProductsByUser(products_, userNameQuery) {
   );
 }
 
-// function filterProductsByCategory(products_, categoryQuery) {
-//   let visibleProducts = [...products_];
+function filterProductsByCategory(products_, categoryQuery) {
+  let visibleProducts = [...products_];
 
-//   if (categoryQuery.includes('All')) {
-//     return visibleProducts;
-//   }
+  if (categoryQuery.length === 0) {
+    return visibleProducts;
+  }
 
-//   visibleProducts = visibleProducts.filter(product =>
-//     categoryQuery.includes(product.categoryTitle),
-//   );
+  visibleProducts = visibleProducts.filter(product =>
+    categoryQuery.includes(product.categoryTitle),
+  );
 
-//   return visibleProducts;
-// }
+  return visibleProducts;
+}
 
 export const App = () => {
   const [currentQueryByUserName, setCurrentQueryByUserName] = useState('All');
@@ -86,12 +86,12 @@ export const App = () => {
     products,
     currentQueryByUserName,
   );
-  // const selectedCategories = [];
-  const [categoryButtonIsActive, setCategoryButtonIsActive] = useState(false);
-  // const visibleProductsByCategory = filterProductsByCategory(
-  //   visibleProductsByUserName,
-  //   selectedCategories,
-  // );
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const visibleProductsByCategory = filterProductsByCategory(
+    visibleProductsByUserName,
+    selectedCategories,
+  );
+  // console.log(selectedCategories.length === 0)
 
   return (
     <div className="section">
@@ -153,7 +153,14 @@ export const App = () => {
               <a
                 href="#/"
                 data-cy="AllCategories"
-                className="button is-success mr-6 is-outlined"
+                className={classNames('button is-success mr-6', {
+                  'is-outlined': selectedCategories.length !== 0,
+                })}
+                onClick={() => {
+                  if (selectedCategories.length !== 0) {
+                    setSelectedCategories([]);
+                  }
+                }}
               >
                 All
               </a>
@@ -161,8 +168,8 @@ export const App = () => {
               {categoriesFromServer.map(category => (
                 <Category
                   category={category}
-                  buttonIsActive={categoryButtonIsActive}
-                  setButtonIsActive={setCategoryButtonIsActive}
+                  selectedCategory={selectedCategories}
+                  setSelectedCategory={setSelectedCategories}
                   key={category.title}
                 />
               ))}
@@ -181,12 +188,12 @@ export const App = () => {
         </div>
 
         <div className="box table-container">
-          {visibleProductsByUserName.length === 0 ? (
+          {visibleProductsByCategory.length === 0 ? (
             <p data-cy="NoMatchingMessage">
               No products matching selected criteria
             </p>
           ) : (
-            <Table products={visibleProductsByUserName} />
+            <Table products={visibleProductsByCategory} />
           )}
         </div>
       </div>
